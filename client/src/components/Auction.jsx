@@ -1,13 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getPrivateKey } from '../utils/authState';
 import { signData, arrayBufferToBase64 } from '../utils/crypto';
 
 export default function Auction() {
     const [amount, setAmount] = useState('');
     const [logs, setLogs] = useState([]);
+    const [currentPrice, setCurrentPrice] = useState(null);
+    const [highestBidder, setHighestBidder] = useState('');
     const auctionId = "item-1"; // Hardcoded for MVP
 
     const addLog = (msg) => setLogs(prev => [...prev, msg]);
+
+    // Fetch initial state
+    useEffect(() => {
+        const fetchState = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`http://localhost:8080/api/auctions/${auctionId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setCurrentPrice(data.currentPrice);
+                    setHighestBidder(data.highestBidderId);
+                    addLog(`Loaded Auction: ${data.item} at $${data.currentPrice}`);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchState();
+    }, []);
 
     const handleBid = async (e) => {
         e.preventDefault();
@@ -50,6 +73,13 @@ export default function Auction() {
             if (response.ok) {
                 const text = await response.text();
                 addLog(`Success: ${text}`);
+                // Parse price from message or re-fetch. 
+                // Message format: "Bid accepted. Current price: 150.0"
+                const match = text.match(/Current price: (\d+\.\d+)/);
+                if (match) {
+                    setCurrentPrice(parseFloat(match[1]));
+                    setHighestBidder("You"); // Optimistic update
+                }
             } else {
                 const text = await response.text();
                 addLog(`Error: ${text}`);
@@ -66,7 +96,11 @@ export default function Auction() {
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
                     <h2 className="text-3xl font-bold text-cyan-400 mb-4">Live Auction: Antique Vase</h2>
-                    <p className="text-gray-300 mb-6">Item ID: {auctionId}</p>
+                    <div className="mb-6 text-gray-300">
+                        <p>Item ID: <span className="font-mono text-cyan-200">{auctionId}</span></p>
+                        <p className="text-2xl mt-2">Current Price: <span className="text-green-400 font-bold">${currentPrice || '...'}</span></p>
+                        {highestBidder && <p className="text-sm text-gray-400">Highest Bidder: {highestBidder}</p>}
+                    </div>
 
                     <form onSubmit={handleBid} className="flex gap-4">
                         <input

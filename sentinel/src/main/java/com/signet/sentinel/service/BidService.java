@@ -51,4 +51,8 @@ public class BidService {
 
         return "Bid accepted. Current price: " + response.getCurrentPrice();
     }
+
+    public com.signet.grpc.AuctionState getAuctionState(String auctionId) {
+        return auctionServiceStub.getAuctionState(com.signet.grpc.AuctionId.newBuilder().setId(auctionId).build());
+    }
 }
