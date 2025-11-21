@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres-sentinel:
+    image: postgres:15-alpine
+    container_name: signet-postgres-sentinel
+    environment:
+      POSTGRES_DB: signet_sentinel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_sentinel_data:/var/lib/postgresql/data
+
+  postgres-gavel:
+    image: postgres:15-alpine
+    container_name: signet-postgres-gavel
+    environment:
+      POSTGRES_DB: signet_gavel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_gavel_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_sentinel_data:
+  postgres_gavel_data:

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.signet.grpc";
+option java_outer_classname = "AuctionProto";
+
+service AuctionService {
+  // Topic 6: Contract-based communication
+  rpc PlaceBid (BidRequest) returns (BidResponse);
+  rpc GetAuctionState (AuctionId) returns (AuctionState);
+}
+
+message BidRequest {
+  string auction_id = 1;
+  string user_id = 2;
+  double amount = 3;
+  int64 timestamp = 4;
+  bytes signature = 5; // Added signature field for verification if needed at Gavel level, though Sentinel verifies it.
+}
+
+message BidResponse {
+  bool success = 1;
+  string message = 2;
+  double current_price = 3;
+}
+
+message AuctionId {
+  string id = 1;
+}
+
+message AuctionState {
+  string id = 1;
+  string item = 2;
+  double current_price = 3;
+  string highest_bidder_id = 4;
+}
