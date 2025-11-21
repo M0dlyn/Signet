@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Register from './components/Register';
-import Login from './components/Login';
+import Auction from './components/Auction';
 
 function App() {
   return (
@@ -9,8 +9,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
-        {/* Placeholder for Auction route */}
-        <Route path="/auction" element={<div className="text-white text-center mt-20">Auction Page (Coming Soon)</div>} />
+        <Route path="/auction" element={<Auction />} />
       </Routes>
     </Router>
   );
