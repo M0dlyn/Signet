@@ -6,12 +6,10 @@ import com.signet.grpc.BidResponse;
 import com.signet.sentinel.dto.RestBidRequest;
 import com.signet.sentinel.model.User;
 import com.signet.sentinel.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class BidService {
 
     private final UserRepository userRepository;
@@ -19,6 +17,11 @@ public class BidService {
 
     @GrpcClient("gavel-service")
     private AuctionServiceGrpc.AuctionServiceBlockingStub auctionServiceStub;
+
+    public BidService(UserRepository userRepository, SignatureVerifier signatureVerifier) {
+        this.userRepository = userRepository;
+        this.signatureVerifier = signatureVerifier;
+    }
 
     public String placeBid(String username, RestBidRequest request) {
         // 1. Fetch User & Public Key

@@ -2,17 +2,19 @@ package com.signet.sentinel.controller;
 
 import com.signet.grpc.AuctionState;
 import com.signet.sentinel.service.BidService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auctions")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class AuctionController {
 
     private final BidService bidService;
+
+    public AuctionController(BidService bidService) {
+        this.bidService = bidService;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuctionState(@PathVariable String id) {
@@ -34,12 +36,49 @@ public class AuctionController {
         }
     }
 
-    @lombok.Data
-    @lombok.AllArgsConstructor
     static class AuctionStateDto {
         private String id;
         private String item;
         private double currentPrice;
         private String highestBidderId;
+
+        public AuctionStateDto(String id, String item, double currentPrice, String highestBidderId) {
+            this.id = id;
+            this.item = item;
+            this.currentPrice = currentPrice;
+            this.highestBidderId = highestBidderId;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getItem() {
+            return item;
+        }
+
+        public void setItem(String item) {
+            this.item = item;
+        }
+
+        public double getCurrentPrice() {
+            return currentPrice;
+        }
+
+        public void setCurrentPrice(double currentPrice) {
+            this.currentPrice = currentPrice;
+        }
+
+        public String getHighestBidderId() {
+            return highestBidderId;
+        }
+
+        public void setHighestBidderId(String highestBidderId) {
+            this.highestBidderId = highestBidderId;
+        }
     }
 }
