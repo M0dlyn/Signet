@@ -2,15 +2,17 @@ package com.signet.gavel.config;
 
 import com.signet.gavel.model.Auction;
 import com.signet.gavel.repository.AuctionRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
     private final AuctionRepository auctionRepository;
+
+    public DataSeeder(AuctionRepository auctionRepository) {
+        this.auctionRepository = auctionRepository;
+    }
 
     @Override
     public void run(String... args) throws Exception {

@@ -8,15 +8,17 @@ import com.signet.grpc.BidResponse;
 import com.signet.grpc.AuctionId;
 import com.signet.grpc.AuctionState;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.transaction.annotation.Transactional;
 
 @GrpcService
-@RequiredArgsConstructor
 public class AuctionServiceImpl extends AuctionServiceGrpc.AuctionServiceImplBase {
 
     private final AuctionRepository auctionRepository;
+
+    public AuctionServiceImpl(AuctionRepository auctionRepository) {
+        this.auctionRepository = auctionRepository;
+    }
 
     @Override
     @Transactional
