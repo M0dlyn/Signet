@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { generateKeyPair, exportPublicKey } from '../utils/crypto';
+import { generateKeyPair, exportPublicKey, exportPrivateKey } from '../utils/crypto';
 import { useNavigate } from 'react-router-dom';
 
 import { setPrivateKey } from '../utils/authState';
@@ -17,8 +17,11 @@ export default function Register() {
             // 1. Generate Key Pair
             const keyPair = await generateKeyPair();
 
-            // Store Private Key in Memory
-            setPrivateKey(keyPair.privateKey);
+            // Store Private Key in Memory (and LocalStorage)
+            const privateKeyPem = await exportPrivateKey(keyPair.privateKey);
+            setPrivateKey(privateKeyPem);
+
+            // 2. Export Public Key
 
             // 2. Export Public Key
             const publicKeyPem = await exportPublicKey(keyPair.publicKey);

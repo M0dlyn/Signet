@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getPrivateKey } from '../utils/authState';
-import { signData, arrayBufferToBase64 } from '../utils/crypto';
+import { signData, arrayBufferToBase64, importPrivateKey } from '../utils/crypto';
 
 export default function Auction() {
     const [amount, setAmount] = useState('');
@@ -37,7 +37,7 @@ export default function Auction() {
         const privateKey = getPrivateKey();
 
         if (!privateKey) {
-            alert("No Private Key found in memory! Did you register in this session?");
+            alert("No Private Key found! Please register or login again.");
             return;
         }
 
@@ -45,12 +45,15 @@ export default function Auction() {
             const timestamp = Date.now();
             const bidAmount = parseFloat(amount);
 
+            // Import the private key from PEM
+            const importedKey = await importPrivateKey(privateKey);
+
             // 1. Construct Payload: auctionId:amount:timestamp
             const payload = `${auctionId}:${bidAmount}:${timestamp}`;
             addLog(`Signing Payload: ${payload}`);
 
             // 2. Sign Payload
-            const signatureBuffer = await signData(privateKey, payload);
+            const signatureBuffer = await signData(importedKey, payload);
             const signatureBase64 = arrayBufferToBase64(signatureBuffer);
             addLog(`Signature generated.`);
 
@@ -82,7 +85,7 @@ export default function Auction() {
                 }
             } else {
                 const text = await response.text();
-                addLog(`Error: ${text}`);
+                addLog(`Error: ${text || response.statusText}`);
             }
 
         } catch (error) {

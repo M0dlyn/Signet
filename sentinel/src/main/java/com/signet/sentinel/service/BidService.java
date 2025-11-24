@@ -30,7 +30,13 @@ public class BidService {
 
         // 2. Construct Payload for Verification
         // MUST MATCH CLIENT: auctionId:amount:timestamp
-        String payload = request.getAuctionId() + ":" + request.getAmount() + ":" + request.getTimestamp();
+        String amountStr;
+        if (request.getAmount() % 1 == 0) {
+            amountStr = String.valueOf(request.getAmount().intValue());
+        } else {
+            amountStr = String.valueOf(request.getAmount());
+        }
+        String payload = request.getAuctionId() + ":" + amountStr + ":" + request.getTimestamp();
 
         // 3. Verify Signature
         boolean isValid = signatureVerifier.verify(user.getPublicKeyPem(), payload, request.getSignature());

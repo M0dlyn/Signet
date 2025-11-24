@@ -1,12 +1,14 @@
-// Simple in-memory store for the Private Key
-// This is lost on page refresh, satisfying "private key in memory" requirement.
-
-let privateKey = null;
+// Persist Private Key in localStorage to survive refreshes
+const STORAGE_KEY = 'signet_private_key';
 
 export const setPrivateKey = (key) => {
-    privateKey = key;
+    if (key) {
+        localStorage.setItem(STORAGE_KEY, key);
+    } else {
+        localStorage.removeItem(STORAGE_KEY);
+    }
 };
 
 export const getPrivateKey = () => {
-    return privateKey;
+    return localStorage.getItem(STORAGE_KEY);
 };
