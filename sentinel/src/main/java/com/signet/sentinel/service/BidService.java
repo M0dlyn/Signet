@@ -6,9 +6,12 @@ import com.signet.grpc.BidRequest;
 import com.signet.grpc.BidResponse;
 import com.signet.grpc.ListAuctionsRequest;
 import com.signet.grpc.ListAuctionsResponse;
-import com.signet.sentinel.dto.RestBidRequest;
+import com.signet.grpc.CreateAuctionRequest;
+import com.signet.grpc.CreateAuctionResponse;
 import com.signet.sentinel.model.User;
 import com.signet.sentinel.repository.UserRepository;
+import com.signet.sentinel.util.SignatureVerifier;
+import com.signet.sentinel.dto.RestBidRequest;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
@@ -73,5 +76,14 @@ public class BidService {
     public List<AuctionState> listAuctions() {
         ListAuctionsResponse response = auctionServiceStub.listAuctions(ListAuctionsRequest.newBuilder().build());
         return response.getAuctionsList();
+    }
+
+    public CreateAuctionResponse createAuction(String id, String item, double startingPrice, String creatorId) {
+        return auctionServiceStub.createAuction(CreateAuctionRequest.newBuilder()
+                .setId(id)
+                .setItem(item)
+                .setStartingPrice(startingPrice)
+                .setCreatorId(creatorId)
+                .build());
     }
 }

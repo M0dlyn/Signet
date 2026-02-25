@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Auction from './components/Auction';
 import AuctionList from './components/AuctionList';
 import AccountSettings from './components/AccountSettings';
+import CreateAuction from './components/CreateAuction';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -22,6 +23,7 @@ function App() {
         <Route path="/auctions" element={<ProtectedRoute><AuctionList /></ProtectedRoute>} />
         <Route path="/auction/:id" element={<ProtectedRoute><Auction /></ProtectedRoute>} />
         <Route path="/account" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
+        <Route path="/create-auction" element={<ProtectedRoute><CreateAuction /></ProtectedRoute>} />
 
         {/* Redirects */}
         <Route path="/auction" element={<Navigate to="/auctions" replace />} />

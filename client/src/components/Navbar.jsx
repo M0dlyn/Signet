@@ -31,6 +31,17 @@ export default function Navbar() {
             {/* Nav links */}
             <div className="flex items-center gap-2">
                 <NavLink to="/auctions" className={linkClass}>Auctions</NavLink>
+                <NavLink
+                    to="/create-auction"
+                    className={({ isActive }) =>
+                        `px-3 py-1 rounded-md text-sm font-semibold transition-all border ${isActive
+                            ? 'text-cyan-300 bg-cyan-900/40 border-cyan-700/60'
+                            : 'text-cyan-400 border-cyan-700/40 hover:bg-cyan-900/30 hover:border-cyan-500/60'
+                        }`
+                    }
+                >
+                    + Create
+                </NavLink>
                 <NavLink to="/account" className={linkClass}>
                     👤 {username}
                 </NavLink>

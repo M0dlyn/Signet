@@ -11,6 +11,7 @@ export default function Auction() {
     const [logs, setLogs] = useState([]);
     const [currentPrice, setCurrentPrice] = useState(null);
     const [highestBidder, setHighestBidder] = useState('');
+    const [creatorId, setCreatorId] = useState('');
     const [itemName, setItemName] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -32,6 +33,7 @@ export default function Auction() {
                     const data = await res.json();
                     setCurrentPrice(data.currentPrice);
                     setHighestBidder(data.highestBidderId);
+                    setCreatorId(data.creatorId);
                     setItemName(data.item);
                     addLog(`Loaded "${data.item}" at $${data.currentPrice}`);
                 } else if (res.status === 401 || res.status === 403) {
@@ -98,6 +100,7 @@ export default function Auction() {
 
     const username = localStorage.getItem('username');
     const isWinning = highestBidder && (highestBidder === username || highestBidder === 'You');
+    const isCreator = creatorId === username;
 
     return (
         <div className="min-h-screen bg-gray-950 text-white pt-20 pb-12 px-6">
@@ -134,35 +137,41 @@ export default function Auction() {
                                 </div>
                                 {highestBidder && (
                                     <span className={`mb-1 text-xs px-2.5 py-1 rounded-full font-semibold border ${isWinning
-                                            ? 'bg-green-500/20 text-green-400 border-green-500/40'
-                                            : 'bg-gray-700 text-gray-400 border-gray-600'
+                                        ? 'bg-green-500/20 text-green-400 border-green-500/40'
+                                        : 'bg-gray-700 text-gray-400 border-gray-600'
                                         }`}>
                                         {isWinning ? '🏆 You\'re winning!' : `Highest: ${highestBidder}`}
                                     </span>
                                 )}
                             </div>
 
-                            <form onSubmit={handleBid} className="flex gap-3">
-                                <input
-                                    type="number"
-                                    min={currentPrice ? currentPrice + 0.01 : 0}
-                                    step="0.01"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder={`Enter bid above $${currentPrice || '...'}`}
-                                    className="flex-1 px-4 py-2.5 bg-gray-700 rounded-lg border border-gray-600
-                                               focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-500/30
-                                               text-white placeholder-gray-500"
-                                    required
-                                />
-                                <button
-                                    type="submit"
-                                    className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold
-                                               transition-all active:scale-95 shadow-md shadow-cyan-900/30 whitespace-nowrap"
-                                >
-                                    Place Signed Bid
-                                </button>
-                            </form>
+                            {isCreator ? (
+                                <div className="px-4 py-3 bg-gray-700/50 rounded-lg border border-gray-600 text-center text-gray-400 font-semibold">
+                                    You cannot bid on your own auction.
+                                </div>
+                            ) : (
+                                <form onSubmit={handleBid} className="flex gap-3">
+                                    <input
+                                        type="number"
+                                        min={currentPrice ? currentPrice + 0.01 : 0}
+                                        step="0.01"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        placeholder={`Enter bid above $${currentPrice || '...'}`}
+                                        className="flex-1 px-4 py-2.5 bg-gray-700 rounded-lg border border-gray-600
+                                                   focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-500/30
+                                                   text-white placeholder-gray-500"
+                                        required
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold
+                                                   transition-all active:scale-95 shadow-md shadow-cyan-900/30 whitespace-nowrap"
+                                    >
+                                        Place Signed Bid
+                                    </button>
+                                </form>
+                            )}
                         </>
                     )}
                 </div>

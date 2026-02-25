@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Auction {
 
     @Id
-    private String id; // Using String ID as per proto (e.g. "item-1")
+    private String id;
 
     @Column(nullable = false)
     private String item;
@@ -17,18 +17,12 @@ public class Auction {
 
     private String highestBidderId;
 
-    @Version // Optimistic Locking
+    private String creatorId;
+
+    @Version
     private Long version;
 
     public Auction() {
-    }
-
-    public Auction(String id, String item, Double currentPrice, String highestBidderId, Long version) {
-        this.id = id;
-        this.item = item;
-        this.currentPrice = currentPrice;
-        this.highestBidderId = highestBidderId;
-        this.version = version;
     }
 
     public String getId() {
@@ -61,6 +55,14 @@ public class Auction {
 
     public void setHighestBidderId(String highestBidderId) {
         this.highestBidderId = highestBidderId;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
     public Long getVersion() {
