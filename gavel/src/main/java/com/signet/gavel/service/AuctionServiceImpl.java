@@ -7,9 +7,14 @@ import com.signet.grpc.BidRequest;
 import com.signet.grpc.BidResponse;
 import com.signet.grpc.AuctionId;
 import com.signet.grpc.AuctionState;
+import com.signet.grpc.ListAuctionsRequest;
+import com.signet.grpc.ListAuctionsResponse;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @GrpcService
 public class AuctionServiceImpl extends AuctionServiceGrpc.AuctionServiceImplBase {
@@ -37,10 +42,9 @@ public class AuctionServiceImpl extends AuctionServiceGrpc.AuctionServiceImplBas
                 return;
             }
 
-            // Update Auction
             auction.setCurrentPrice(request.getAmount());
             auction.setHighestBidderId(request.getUserId());
-            auctionRepository.save(auction); // @Version will check for concurrency here
+            auctionRepository.save(auction);
 
             responseObserver.onNext(BidResponse.newBuilder()
                     .setSuccess(true)
@@ -50,11 +54,10 @@ public class AuctionServiceImpl extends AuctionServiceGrpc.AuctionServiceImplBas
             responseObserver.onCompleted();
 
         } catch (org.springframework.orm.ObjectOptimisticLockingFailureException e) {
-            // Handle Race Condition
             responseObserver.onNext(BidResponse.newBuilder()
                     .setSuccess(false)
                     .setMessage("Bid rejected: Someone placed a bid at the same time. Please retry.")
-                    .setCurrentPrice(0.0) // Client should refresh
+                    .setCurrentPrice(0.0)
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -80,5 +83,22 @@ public class AuctionServiceImpl extends AuctionServiceGrpc.AuctionServiceImplBas
                     responseObserver.onCompleted();
                 },
                 () -> responseObserver.onError(new RuntimeException("Auction not found")));
+    }
+
+    @Override
+    public void listAuctions(ListAuctionsRequest request, StreamObserver<ListAuctionsResponse> responseObserver) {
+        List<AuctionState> states = auctionRepository.findAll().stream()
+                .map(auction -> AuctionState.newBuilder()
+                        .setId(auction.getId())
+                        .setItem(auction.getItem())
+                        .setCurrentPrice(auction.getCurrentPrice())
+                        .setHighestBidderId(auction.getHighestBidderId() == null ? "" : auction.getHighestBidderId())
+                        .build())
+                .collect(Collectors.toList());
+
+        responseObserver.onNext(ListAuctionsResponse.newBuilder()
+                .addAllAuctions(states)
+                .build());
+        responseObserver.onCompleted();
     }
 }

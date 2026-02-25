@@ -8,6 +8,7 @@ service AuctionService {
   // Topic 6: Contract-based communication
   rpc PlaceBid (BidRequest) returns (BidResponse);
   rpc GetAuctionState (AuctionId) returns (AuctionState);
+  rpc ListAuctions (ListAuctionsRequest) returns (ListAuctionsResponse);
 }
 
 message BidRequest {
@@ -15,7 +16,7 @@ message BidRequest {
   string user_id = 2;
   double amount = 3;
   int64 timestamp = 4;
-  bytes signature = 5; // Added signature field for verification if needed at Gavel level, though Sentinel verifies it.
+  bytes signature = 5;
 }
 
 message BidResponse {
@@ -33,4 +34,10 @@ message AuctionState {
   string item = 2;
   double current_price = 3;
   string highest_bidder_id = 4;
+}
+
+message ListAuctionsRequest {}
+
+message ListAuctionsResponse {
+  repeated AuctionState auctions = 1;
 }

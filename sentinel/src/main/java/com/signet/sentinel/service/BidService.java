@@ -1,13 +1,18 @@
 package com.signet.sentinel.service;
 
 import com.signet.grpc.AuctionServiceGrpc;
+import com.signet.grpc.AuctionState;
 import com.signet.grpc.BidRequest;
 import com.signet.grpc.BidResponse;
+import com.signet.grpc.ListAuctionsRequest;
+import com.signet.grpc.ListAuctionsResponse;
 import com.signet.sentinel.dto.RestBidRequest;
 import com.signet.sentinel.model.User;
 import com.signet.sentinel.repository.UserRepository;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BidService {
@@ -47,7 +52,7 @@ public class BidService {
         // 4. Forward to Gavel via gRPC
         BidRequest grpcRequest = BidRequest.newBuilder()
                 .setAuctionId(request.getAuctionId())
-                .setUserId(user.getUsername()) // Or ID
+                .setUserId(user.getUsername())
                 .setAmount(request.getAmount())
                 .setTimestamp(request.getTimestamp())
                 .build();
@@ -61,7 +66,12 @@ public class BidService {
         return "Bid accepted. Current price: " + response.getCurrentPrice();
     }
 
-    public com.signet.grpc.AuctionState getAuctionState(String auctionId) {
+    public AuctionState getAuctionState(String auctionId) {
         return auctionServiceStub.getAuctionState(com.signet.grpc.AuctionId.newBuilder().setId(auctionId).build());
+    }
+
+    public List<AuctionState> listAuctions() {
+        ListAuctionsResponse response = auctionServiceStub.listAuctions(ListAuctionsRequest.newBuilder().build());
+        return response.getAuctionsList();
     }
 }

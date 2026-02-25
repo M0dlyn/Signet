@@ -31,7 +31,7 @@ export default function Login() {
                 // This is a known limitation of "Key in memory". 
                 // For now, let's just handle the JWT part.
                 alert('Login successful!');
-                navigate('/auction');
+                navigate('/auctions');
             } else {
                 alert('Login failed');
             }

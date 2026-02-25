@@ -2,15 +2,31 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Register from './components/Register';
 import Login from './components/Login';
 import Auction from './components/Auction';
+import AuctionList from './components/AuctionList';
+import AccountSettings from './components/AccountSettings';
+
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" replace />;
+}
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/auction" element={<Auction />} />
+
+        {/* Protected routes */}
+        <Route path="/auctions" element={<ProtectedRoute><AuctionList /></ProtectedRoute>} />
+        <Route path="/auction/:id" element={<ProtectedRoute><Auction /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
+
+        {/* Redirects */}
+        <Route path="/auction" element={<Navigate to="/auctions" replace />} />
+        <Route path="/" element={<Navigate to="/auctions" replace />} />
+        <Route path="*" element={<Navigate to="/auctions" replace />} />
       </Routes>
     </Router>
   );

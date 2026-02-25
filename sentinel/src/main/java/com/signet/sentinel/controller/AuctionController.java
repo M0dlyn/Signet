@@ -5,6 +5,9 @@ import com.signet.sentinel.service.BidService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/auctions")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -16,16 +19,22 @@ public class AuctionController {
         this.bidService = bidService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> listAuctions() {
+        try {
+            List<AuctionStateDto> auctions = bidService.listAuctions().stream()
+                    .map(s -> new AuctionStateDto(s.getId(), s.getItem(), s.getCurrentPrice(), s.getHighestBidderId()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(auctions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to list auctions: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuctionState(@PathVariable String id) {
         try {
             AuctionState state = bidService.getAuctionState(id);
-            // Convert Protobuf object to JSON-friendly response if needed,
-            // but Spring Boot + Jackson usually handles Protobuf if configured,
-            // or we return a DTO. For simplicity, let's return a DTO or map.
-            // Protobuf objects have a lot of internal fields.
-            // Let's return a simple Map or DTO.
-
             return ResponseEntity.ok(new AuctionStateDto(
                     state.getId(),
                     state.getItem(),
